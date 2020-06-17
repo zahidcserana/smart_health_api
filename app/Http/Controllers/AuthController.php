@@ -19,7 +19,7 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['postLogin']]);
     }
 
-    public function postLogin()
+    public function _postLogin()
     {
         $credentials = request(['email', 'password']);
 
@@ -30,7 +30,7 @@ class AuthController extends Controller
         return $this->respondWithToken($token);
     }
 
-    public function _postLogin(Request $request)
+    public function postLogin(Request $request)
     {
         $this->validate($request, [
             'email'    => 'required|email|max:255',

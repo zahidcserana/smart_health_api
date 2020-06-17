@@ -27,5 +27,9 @@ $app->routeMiddleware([
 4. AuthController.php
 5. .env
 6. web.php
+
 # tymon-jwt-auth
 # smart_health_api
+
+# serve
+php -S localhost:8000 -t public
