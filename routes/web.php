@@ -16,14 +16,12 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-$router->post('auth/login', ['uses' => 'AuthController@postLogin']);
-
-
 $router->group(
     ['prefix' => 'api'],
     function () use ($router) {
 
         $router->post('auth/login', ['uses' => 'AuthController@postLogin']);
+        $router->post('auth/register', ['uses' => 'AuthController@register']);
 
         $router->group(
             ['middleware' => 'auth:api'],

@@ -2,28 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseController;
+use App\User;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\JWTAuth;
+use Validator;
 
-class AuthController extends Controller
+class AuthController extends BaseController
 {
-    /**
-     * @var \Tymon\JWTAuth\JWTAuth
-     */
     protected $jwt;
 
     public function __construct(JWTAuth $jwt)
     {
         $this->jwt = $jwt;
-        $this->middleware('auth:api', ['except' => ['postLogin']]);
+        $this->middleware('auth:api', ['except' => ['postLogin', 'register']]);
     }
 
     public function _postLogin()
     {
         $credentials = request(['email', 'password']);
 
-        if (! $token = auth()->attempt($credentials)) {
+        if (!$token = auth()->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -54,8 +53,33 @@ class AuthController extends Controller
 
             return response()->json(['token_absent' => $e->getMessage()], 500);
         }
+        $data['token'] = $token;
+        $data['user'] = $user;
+        return $this->sendResponse($data);
+    }
 
-        return response()->json(compact('token', 'user'));
+    /**
+     * Register api
+     *
+     * @return $data
+     */
+    public function register(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'email' => 'required|email',
+            'password' => 'required',
+            'c_password' => 'required|same:password',
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first());
+        }
+        $input = $request->all();
+        $input['password'] = app('hash')->make($input['password']);
+
+        $data['token'] = $this->jwt->attempt(request(['email', 'password']));
+        $data['user'] = auth()->user();
+        return $this->sendResponse($data, $this->successMsg);
     }
     /**
      * Get the authenticated User.
