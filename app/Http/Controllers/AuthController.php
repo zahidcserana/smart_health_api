@@ -15,7 +15,7 @@ class AuthController extends BaseController
     public function __construct(JWTAuth $jwt)
     {
         $this->jwt = $jwt;
-        $this->middleware('auth:api', ['except' => ['postLogin', 'register']]);
+        // $this->middleware('auth:api', ['except' => ['postLogin', 'register']]);
     }
 
     public function _postLogin()
@@ -27,6 +27,24 @@ class AuthController extends BaseController
         }
 
         return $this->respondWithToken($token);
+    }
+
+    public function mobileLogin()
+    {
+        $mobile = request(['mobile']);
+
+
+        $data['login_mobile'] = $mobile;
+        return $this->sendResponse($data, $this->successMsg);
+    }
+
+    public function mobileLoginOtp()
+    {
+        $mobile_otp = request(['mobile_otp']);
+
+
+        $data['mobile_otp'] = $mobile_otp;
+        return $this->sendResponse($data, $this->successMsg);
     }
 
     public function postLogin(Request $request)
@@ -67,6 +85,7 @@ class AuthController extends BaseController
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
+            'mobile' => 'required',
             'email' => 'required|email',
             'password' => 'required',
             'c_password' => 'required|same:password',
@@ -76,6 +95,7 @@ class AuthController extends BaseController
         }
         $input = $request->all();
         $input['password'] = app('hash')->make($input['password']);
+        User::create($input);
 
         $data['token'] = $this->jwt->attempt(request(['email', 'password']));
         $data['user'] = auth()->user();

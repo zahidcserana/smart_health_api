@@ -22,6 +22,8 @@ $router->group(
 
         $router->post('auth/login', ['uses' => 'AuthController@postLogin']);
         $router->post('auth/register', ['uses' => 'AuthController@register']);
+        $router->post('auth/login/mobile', ['uses' => 'AuthController@mobileLogin']);
+        $router->post('auth/login/mobile/otp', ['uses' => 'AuthController@mobileLoginOtp']);
 
         $router->group(
             ['middleware' => 'auth:api'],
