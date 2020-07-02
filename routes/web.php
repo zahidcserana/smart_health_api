@@ -16,6 +16,7 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
+
 $router->group(
     ['prefix' => 'api'],
     function () use ($router) {
@@ -24,6 +25,7 @@ $router->group(
         $router->post('auth/register', ['uses' => 'AuthController@register']);
         $router->post('auth/login/mobile', ['uses' => 'AuthController@mobileLogin']);
         $router->post('auth/login/mobile/otp', ['uses' => 'AuthController@mobileLoginOtp']);
+        $router->post('file/upload', ['uses' => 'AuthController@fileUpload']);
 
         $router->group(
             ['middleware' => 'auth:api'],
@@ -36,6 +38,14 @@ $router->group(
                 $router->post('logout', ['uses' => 'AuthController@logout']);
                 $router->post('refresh', ['uses' => 'AuthController@refresh']);
                 $router->post('me', ['uses' => 'AuthController@me']);
+                $router->put('users/{id}', ['uses' => 'AuthController@update']);
+
+                /* City */
+                $router->get('city-list', ['uses' => 'AuthController@cityList']);
+                $router->get('area-list/{cityId}', ['uses' => 'AuthController@areaList']);
+
+                /* Settings */
+                $router->get('user-settings', ['uses' => 'SettingsController@userSettings']);
             }
         );
     }
