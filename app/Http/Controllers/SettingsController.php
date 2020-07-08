@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\BaseController;
+use Illuminate\Support\Facades\DB;
 
 class SettingsController  extends BaseController
 {
@@ -19,6 +20,7 @@ class SettingsController  extends BaseController
     public function userSettings()
     {
         $data = config('settings.userSettings');
+        $data['doctorSpecialties'] = DB::table('doctor_specialties')->pluck('id', 'title');
 
         return $this->sendResponse($data);
     }

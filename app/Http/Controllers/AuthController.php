@@ -7,6 +7,7 @@ use App\User;
 use App\City;
 use App\Area;
 use App\Http\Container\UserContainer;
+use App\Models\DoctorDetail;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\JWTAuth;
 use Validator;
@@ -134,6 +135,7 @@ class AuthController extends BaseController
     public function me()
     {
         $user = auth()->user();
+        $user->doctor;
         $user['avatar'] = empty($user->picture) ? 'https://avatars0.githubusercontent.com/u/1472352?s=460&v=4' : $this->imageDir . $user->picture;
         return $this->sendResponse($user);
     }
@@ -164,6 +166,17 @@ class AuthController extends BaseController
         $user->update($data);
         $user['avatar'] = empty($user->picture) ? 'https://avatars0.githubusercontent.com/u/1472352?s=460&v=4' : $this->imageDir . $user->picture;
 
+        if ($request->input('doctor')) {
+            $doctorDetails = $request->input('doctor');
+            $doctorDetails['user_id'] = $user->id;
+            $doctor = DoctorDetail::where('user_id', $user->id)->first();
+            if ($doctor) {
+                $doctor->update($doctorDetails);
+            } else {
+                DoctorDetail::create($doctorDetails);
+            }
+        }
+        $user->doctor;
         return $this->sendResponse($user, $this->successMsg);
     }
 

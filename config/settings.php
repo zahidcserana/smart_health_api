@@ -14,7 +14,7 @@ return [
     ],
 
     'userSettings' => [
-        'bloodGroup' => [
+        'bloodGroups' => [
             'A+',
             'A-',
             'B+',
@@ -24,11 +24,11 @@ return [
             'AB+',
             'AB-'
         ],
-        'gender' => [
+        'genders' => [
             'MALE' => 'Male',
             'FEMALE' => 'Female'
         ],
-        'userType' => [
+        'userTypes' => [
             'USER' => 'User',
             'DOCTOR' => 'Doctor'
         ],

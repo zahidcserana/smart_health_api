@@ -46,6 +46,11 @@ $router->group(
 
                 /* Settings */
                 $router->get('user-settings', ['uses' => 'SettingsController@userSettings']);
+
+                /* *** doctor-schedule *** */
+                $router->get('doctor-schedule-list/{doctorId}', ['uses' => 'DoctorController@doctorScheduleList']);
+                $router->post('doctor-schedule', ['uses' => 'DoctorController@doctorSchedule']);
+                $router->put('doctor-schedule/{id}', ['uses' => 'DoctorController@updateSchedule']);
             }
         );
     }
