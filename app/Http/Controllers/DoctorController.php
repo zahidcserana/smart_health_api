@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\BaseController;
 use App\Models\DoctorSchedule;
+use App\Models\AppointmentSlot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Validator;
@@ -66,5 +67,46 @@ class DoctorController  extends BaseController
         $list = DoctorSchedule::where('doctor_id', $doctorId)->get();
 
         return $this->sendResponse($list);
+    }
+
+    public function makeScheduleSlot()
+    {
+        $lastAppointmentDate = AppointmentSlot::where('doctor_id', 1)->orderBy('start_time', 'desc')->first();
+        $s = $lastAppointmentDate->start_time;
+        $dt = new \DateTime($s);
+
+        $date = $dt->format('Y-m-d');
+
+        $doctorSchedules = DoctorSchedule::where('status', 1)->orderBy('doctor_id', 'desc')->get();
+        foreach ($doctorSchedules as $i => $row) {
+            $interval = config('settings.appointmentInterval');
+            $start = $row->start_time;
+            $end = $row->end_time;
+
+            $startTime = \Carbon\Carbon::createFromFormat('H:s', $start);
+            $endTime = \Carbon\Carbon::createFromFormat('H:s', $end);
+
+
+            $difference = $startTime->diffInMinutes($endTime);
+
+            $count = (int) $difference / $interval;
+            $nextTime = $startTime;
+
+            for ($i = 0; $i < $count; $i++) {
+                $appointmentStart = $nextTime;
+                dd($appointmentStart);
+
+                $nextTime = $nextTime->addMinutes($interval);
+                $input = array(
+                    'doctor_id' => $row->doctor_id,
+                    'start_time' => $appointmentStart,
+                    'end_time' => $nextTime
+                );
+                $slot = AppointmentSlot::create($input);
+                // echo $nextTime;
+                // echo '<br>';
+            }
+        }
+        // dd($result);
     }
 }

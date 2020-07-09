@@ -2,6 +2,8 @@
 
 return [
 
+    'appointmentInterval' => 20,
+
     'defaults' => [
         'guard' => env('AUTH_GUARD', 'api'),
     ],
