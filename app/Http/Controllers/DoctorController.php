@@ -6,6 +6,7 @@ use App\Http\Controllers\BaseController;
 use App\Models\DoctorSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Validator;
 
 class DoctorController  extends BaseController
 {
@@ -21,6 +22,14 @@ class DoctorController  extends BaseController
 
     public function doctorSchedule(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'day' => 'required',
+            'start_time' => 'required',
+            'end_time' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError($validator->errors()->first(), 200);
+        }
         $data = $request->all();
         $schedule = DoctorSchedule::where('doctor_id', $data['doctor_id'])->where('day', $data['day'])->first();
         if ($schedule) {
