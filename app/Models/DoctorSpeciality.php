@@ -3,20 +3,20 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-// use Illuminate\Database\Eloquent\SoftDeletes;
 
-class AppointmentSlot extends Model
+class DoctorSpeciality extends Model
 {
-    // use SoftDeletes;
+    protected $table = 'doctor_specialties';
+
     protected $guarded = [];
 
     protected $hidden = [
         'updated_at',
-        'deleted_at',
+        'created_at',
     ];
 
     public function doctor()
     {
-        return $this->belongsTo('App\Models\DoctorDetail');
+        return $this->hasMany('App\Models\DoctorDetail', 'specialty_id');
     }
 }

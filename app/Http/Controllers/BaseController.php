@@ -14,6 +14,8 @@ class BaseController extends Controller
     protected $order, $dateData;
     protected $successMsg = 'Data Successfully saved.';
     protected $errorMsg = 'Something went wrong.';
+    protected $imageDir = 'http://shapi.local/assets/images/';
+
 
     public function __construct()
     {

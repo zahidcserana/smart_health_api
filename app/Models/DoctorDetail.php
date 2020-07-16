@@ -14,4 +14,9 @@ class DoctorDetail extends Model
     {
         return $this->belongsTo('App\User');
     }
+
+    public function speciality()
+    {
+        return $this->belongsTo('App\Models\DoctorSpeciality', 'specialty_id');
+    }
 }

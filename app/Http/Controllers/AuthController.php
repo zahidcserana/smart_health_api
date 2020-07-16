@@ -16,7 +16,6 @@ class AuthController extends BaseController
 {
     protected $jwt;
     protected $userContainer;
-    protected $imageDir = 'http://shapi.local/assets/images/';
 
 
     public function __construct(JWTAuth $jwt)
@@ -35,6 +34,12 @@ class AuthController extends BaseController
         }
 
         return $this->respondWithToken($token);
+    }
+
+    public function delete($id)
+    {
+        User::destroy($id);
+        return $this->sendResponse('ok');
     }
 
     public function mobileLogin(Request $request)
@@ -109,23 +114,42 @@ class AuthController extends BaseController
      */
     public function register(Request $request)
     {
+        $fromMobile = true;
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'mobile' => 'required',
-            'email' => 'required|email',
-            'password' => 'required',
-            'c_password' => 'required|same:password',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|confirmed',
         ]);
         if ($validator->fails()) {
-            return $this->sendError($validator->errors()->first());
+            return $this->sendError($validator->errors()->first(), 200);
         }
         $input = $request->all();
         $input['password'] = app('hash')->make($input['password']);
-        User::create($input);
+        unset($input['password_confirmation']);
+        try {
+            $user = User::create($input);
+        } catch (\Exception $e) {
+            $msg = $e->getMessage();
+            return $this->sendError($msg, 200);
+        }
+        if ($fromMobile) {
+            return $this->_otp($user);
+        }
 
         $data['token'] = $this->jwt->attempt(request(['email', 'password']));
         $data['user'] = auth()->user();
         return $this->sendResponse($data, $this->successMsg);
+    }
+
+    public function _otp($user)
+    {
+        $user->mobile_otp = mt_rand(1000, 9999);
+        $user->save();
+        $data['login_mobile'] = $user->mobile;
+        $msg = 'OTP has been sent to your mobile: ' . $user->mobile . '. Please use this to login.';
+
+        return $this->sendResponse($data, $msg);
     }
     /**
      * Get the authenticated User.
@@ -140,18 +164,6 @@ class AuthController extends BaseController
         return $this->sendResponse($user);
     }
 
-    public function cityList()
-    {
-        $list = City::all();
-        return $this->sendResponse($list);
-    }
-
-    public function areaList($cityId)
-    {
-        $list = Area::where('city_id', $cityId)->get();
-        return $this->sendResponse($list);
-    }
-
     /**
      * Update user info
      *
@@ -162,22 +174,26 @@ class AuthController extends BaseController
     public function update(Request $request, $id)
     {
         $data = $request->only(['name', 'email', 'mobile', 'city_id', 'area_id', 'address', 'blood_group', 'gender', 'user_type']);
-        $user = User::findOrfail($id);
+        $user = User::with('doctor')->findOrfail($id);
         $user->update($data);
         $user['avatar'] = empty($user->picture) ? 'https://avatars0.githubusercontent.com/u/1472352?s=460&v=4' : $this->imageDir . $user->picture;
-
-        if ($request->input('doctor')) {
-            $doctorDetails = $request->input('doctor');
-            $doctorDetails['user_id'] = $user->id;
-            $doctor = DoctorDetail::where('user_id', $user->id)->first();
-            if ($doctor) {
-                $doctor->update($doctorDetails);
-            } else {
-                DoctorDetail::create($doctorDetails);
-            }
+        if ($user->user_type == 'DOCTOR') {
+            $this->_doctor($user, $request);
         }
-        $user->doctor;
         return $this->sendResponse($user, $this->successMsg);
+    }
+
+    private function _doctor($user, $request)
+    {
+        if ($user->doctor === null) {
+            $user->doctor()->save(new DoctorDetail());
+        } else {
+            $user->doctor->update($request->input('doctor'));
+        }
+        $user->refresh();
+        $user->doctor;
+
+        return $user;
     }
 
     public function fileUpload(Request $request)
@@ -195,33 +211,13 @@ class AuthController extends BaseController
             $file->move('assets/images', $picture);
 
             $user->update(['picture' => $picture]);
-            // dd($user);
-            // $im = file_get_contents($dir);
-            // $uploded_image_file_bytecode = base64_encode($im);
 
-            // $cartModel = new Cart();
-            // $checkFile = $cartModel->where('token', $request->token)->whereNotNull('file_name')->first();
-            // // return response()->json(["message" => $checkFile]);
-
-            // if ($checkFile && file_exists('assets/prescription_image/' . $checkFile->file_name)) {
-            //     unlink('assets/prescription_image/' . $checkFile->file_name);
-            // }
-
-            // $cartData = $cartModel->where('token', $request->token)->update(['file' => $uploded_image_file_bytecode, 'file_name' => $picture]);
-
-            return $this->sendResponse('http://shapi.local/' . $dir, $this->successMsg);
+            return $this->sendResponse(env('DOMAIN_NAME') . $dir, $this->successMsg);
         } else {
             return response()->json(["message" => "Select image first."]);
         }
     }
 
-
-    /**
-     * file upload
-     *
-     * @param Request $request
-     * @return void
-     */
     public function _fileUpload(Request $request)
     {
         $data = $request->all();

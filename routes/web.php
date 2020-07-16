@@ -1,21 +1,8 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Application Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register all of the routes for an application.
-| It is a breeze. Simply tell Lumen the URIs it should respond to
-| and give it the Closure to call when that URI is requested.
-|
-*/
-
-
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
-
 
 $router->group(
     ['prefix' => 'api'],
@@ -26,6 +13,14 @@ $router->group(
         $router->post('auth/login/mobile', ['uses' => 'AuthController@mobileLogin']);
         $router->post('auth/login/mobile/otp', ['uses' => 'AuthController@mobileLoginOtp']);
         $router->post('file/upload', ['uses' => 'AuthController@fileUpload']);
+        $router->get('delete/{id}', ['uses' => 'AuthController@delete']);
+
+        /* City */
+        $router->get('city-list', ['uses' => 'SettingsController@cityList']);
+        $router->get('area-list/{cityId}', ['uses' => 'SettingsController@areaList']);
+
+        /* Settings */
+        $router->get('user-settings', ['uses' => 'SettingsController@userSettings']);
 
         $router->group(
             ['middleware' => 'auth:api'],
@@ -40,18 +35,16 @@ $router->group(
                 $router->post('me', ['uses' => 'AuthController@me']);
                 $router->put('users/{id}', ['uses' => 'AuthController@update']);
 
-                /* City */
-                $router->get('city-list', ['uses' => 'AuthController@cityList']);
-                $router->get('area-list/{cityId}', ['uses' => 'AuthController@areaList']);
-
-                /* Settings */
-                $router->get('user-settings', ['uses' => 'SettingsController@userSettings']);
-
                 /* *** doctor-schedule *** */
-                $router->get('doctor-schedule-slot', ['uses' => 'DoctorController@makeScheduleSlot']);
+                $router->get('doctor-slot/{doctorId}', ['uses' => 'DoctorController@slotList']);
+                // $router->get('doctor-making-slot', ['uses' => 'DoctorController@makingSlot']);
+                // $router->get('doctor-schedule-slot', ['uses' => 'DoctorController@makeScheduleSlot']);
                 $router->get('doctor-schedule-list/{doctorId}', ['uses' => 'DoctorController@doctorScheduleList']);
                 $router->post('doctor-schedule', ['uses' => 'DoctorController@doctorSchedule']);
                 $router->put('doctor-schedule/{id}', ['uses' => 'DoctorController@updateSchedule']);
+
+                /* *** doctor-api *** */
+                $router->get('doctors', ['uses' => 'DoctorController@index']);
             }
         );
     }
