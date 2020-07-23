@@ -36,12 +36,13 @@ $router->group(
                 $router->put('users/{id}', ['uses' => 'AuthController@update']);
 
                 /* *** doctor-schedule *** */
-                $router->get('doctor-slot/{doctorId}', ['uses' => 'DoctorController@slotList']);
+                $router->get('doctor-slot/{doctorId}', ['uses' => 'AppointmentController@slotList']);
                 // $router->get('doctor-making-slot', ['uses' => 'DoctorController@makingSlot']);
-                // $router->get('doctor-schedule-slot', ['uses' => 'DoctorController@makeScheduleSlot']);
+                // $router->get('doctor-schedule-slot', ['uses' => 'AppointmentController@makeScheduleSlot']);
                 $router->get('doctor-schedule-list/{doctorId}', ['uses' => 'DoctorController@doctorScheduleList']);
                 $router->post('doctor-schedule', ['uses' => 'DoctorController@doctorSchedule']);
                 $router->put('doctor-schedule/{id}', ['uses' => 'DoctorController@updateSchedule']);
+                $router->post('doctor-schedule/request', ['uses' => 'AppointmentController@requestSchedule']);
 
                 /* *** doctor-api *** */
                 $router->get('doctors', ['uses' => 'DoctorController@index']);

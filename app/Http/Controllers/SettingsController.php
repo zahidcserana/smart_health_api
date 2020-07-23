@@ -22,7 +22,8 @@ class SettingsController  extends BaseController
     public function userSettings()
     {
         $data = config('settings.userSettings');
-        $data['doctorSpecialties'] = DB::table('doctor_specialties')->pluck('id', 'title');
+        $data['doctorSpecialties'] = DB::table('doctor_specialties')->select('id', 'title')->get();
+        // $data['doctorSpecialties'] = DB::table('doctor_specialties')->pluck('id', 'title');
 
         return $this->sendResponse($data);
     }

@@ -19,4 +19,19 @@ class DoctorDetail extends Model
     {
         return $this->belongsTo('App\Models\DoctorSpeciality', 'specialty_id');
     }
+
+    public function slots()
+    {
+        return $this->hasMany('App\Models\AppointmentSlot', 'doctor_id');
+    }
+
+    public function appointments()
+    {
+        return $this->hasMany('App\Models\Appointment', 'doctor_id')
+            ->select([
+                'doctor_id',
+                'appoint_date',
+                'slot_time'
+            ]);
+    }
 }
