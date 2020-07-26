@@ -4,27 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\BaseController;
 use App\User;
-use App\City;
-use App\Area;
-use App\Http\Container\UserContainer;
 use App\Models\DoctorDetail;
 use Illuminate\Http\Request;
-use Tymon\JWTAuth\JWTAuth;
 use Validator;
 
 class AuthController extends BaseController
 {
-    protected $jwt;
-    protected $userContainer;
-
-
-    public function __construct(JWTAuth $jwt)
-    {
-        $this->jwt = $jwt;
-        $this->userContainer = new UserContainer();
-        // $this->middleware('auth:api', ['except' => ['postLogin', 'register']]);
-    }
-
     public function _postLogin()
     {
         $credentials = request(['email', 'password']);
@@ -114,7 +99,7 @@ class AuthController extends BaseController
      */
     public function register(Request $request)
     {
-        $fromMobile = true;
+        $fromMobile = false;
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'mobile' => 'required',

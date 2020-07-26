@@ -15,13 +15,25 @@ use App\Http\Controllers\BaseController;
 
 class AppointmentController  extends BaseController
 {
-    public function index()
+    public function index(Request $request)
     {
-        $list = $this->appointment->with('user')->with('doctor')->latest()->get();
-        foreach ($list as $row) {
-            $row->user->picture = empty($row->user->picture) ? config('settings.user_pic') : $this->imageDir . $row->user->picture;
-        }
+        $doctorId = $request->input('doctor_id', null);
+        $patientId = $request->input('patient_id', null);
 
+        $list = Appointment::with('user')->with('doctor')
+            ->when($doctorId, function ($query, $doctorId) {
+                return $query->where('appointments.doctor_id', $doctorId);
+            })
+            ->when($patientId, function ($query, $patientId) {
+                return $query->where('appointments.patient_id', $patientId);
+            })
+            ->latest()
+            ->get();
+
+        foreach ($list as $row) {
+            $row->doctor->user;
+            $row->user->avatar = empty($row->user->picture) ? config('settings.user_pic') : $this->imageDir . $row->user->picture;
+        }
         return $this->sendResponse($list);
     }
 
