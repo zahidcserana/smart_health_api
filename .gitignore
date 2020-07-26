@@ -1,4 +1,4 @@
-/vendor
+# /vendor
 /public/assets/images/*
 /.idea
 Homestead.json

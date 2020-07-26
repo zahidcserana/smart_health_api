@@ -15,6 +15,16 @@ use App\Http\Controllers\BaseController;
 
 class AppointmentController  extends BaseController
 {
+    public function index()
+    {
+        $list = $this->appointment->with('user')->with('doctor')->latest()->get();
+        foreach ($list as $row) {
+            $row->user->picture = empty($row->user->picture) ? config('settings.user_pic') : $this->imageDir . $row->user->picture;
+        }
+
+        return $this->sendResponse($list);
+    }
+
     public function slotList($doctorId)
     {
         $collection = AppointmentSlot::select('doctor_id', 'day', 'start_time', 'created_at')->where('doctor_id', $doctorId)->get();
@@ -41,19 +51,7 @@ class AppointmentController  extends BaseController
             $msg = $e->getMessage();
             return $this->sendError($msg, 200);
         }
-
-        // $data['booked'] = Appointment::select([
-        //     'doctor_id',
-        //     'appoint_date',
-        //     'slot_time'
-        // ])
-        //     ->where('doctor_id', $formData['doctor_id'])
-        //     ->where('day', $formData['day'])
-        //     ->where('appoint_date', $formData['appoint_date'])
-        //     ->pluck('slot_time');
-
-        $doctor = DoctorDetail::with('user')->with('speciality')->with('slots')->with('appointments')->findOrFail($formData['doctor_id']);
-        $doctor->picture = empty($doctor->picture) ? 'https://rumaisahospital.com/wp-content/uploads/2015/08/LLH-Doctors-Male-Avatar-300x300.png' : $this->imageDir . $doctor->picture;
+        $doctor = DoctorDetail::with('appointments')->findOrFail($formData['doctor_id']);
 
         return $this->sendResponse($doctor);
     }

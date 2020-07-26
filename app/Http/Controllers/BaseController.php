@@ -8,7 +8,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Guard;
 use App\Http\Controllers\Controller as Controller;
-
+use App\Models\Appointment;
 
 class BaseController extends Controller
 {
@@ -17,6 +17,7 @@ class BaseController extends Controller
     protected $errorMsg = 'Something went wrong.';
     protected $imageDir = 'http://shapi.local/assets/images/';
     protected $currentUser;
+    protected $appointment;
 
     public function __construct(Guard $auth)
     {
@@ -26,6 +27,7 @@ class BaseController extends Controller
             'lastMonth' => date("Y-m-d", strtotime("-1 month")),
         );
         $this->currentUser = $auth->user();
+        $this->appointment = new Appointment();
     }
 
     public function sendResponse($data = array(), $message = '')

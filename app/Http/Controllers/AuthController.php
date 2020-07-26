@@ -160,7 +160,7 @@ class AuthController extends BaseController
     {
         $user = auth()->user();
         $user->doctor;
-        $user['avatar'] = empty($user->picture) ? 'https://avatars0.githubusercontent.com/u/1472352?s=460&v=4' : $this->imageDir . $user->picture;
+        $user['avatar'] = empty($user->picture) ? config('settings.user_pic') : $this->imageDir . $user->picture;
         return $this->sendResponse($user);
     }
 
@@ -176,7 +176,7 @@ class AuthController extends BaseController
         $data = $request->only(['name', 'email', 'mobile', 'city_id', 'area_id', 'address', 'blood_group', 'gender', 'user_type']);
         $user = User::with('doctor')->findOrfail($id);
         $user->update($data);
-        $user['avatar'] = empty($user->picture) ? 'https://avatars0.githubusercontent.com/u/1472352?s=460&v=4' : $this->imageDir . $user->picture;
+        $user['avatar'] = empty($user->picture) ? config('settings.user_pic') : $this->imageDir . $user->picture;
         if ($user->user_type == 'DOCTOR') {
             $this->_doctor($user, $request);
         }

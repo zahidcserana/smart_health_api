@@ -20,7 +20,7 @@ class DoctorController  extends BaseController
         $list = DoctorDetail::with('user')->with('speciality')->with('slots')->with('appointments')->get();
 
         foreach ($list as $row) {
-            $row->user->picture = empty($row->user->picture) ? 'https://rumaisahospital.com/wp-content/uploads/2015/08/LLH-Doctors-Male-Avatar-300x300.png' : $this->imageDir . $row->user->picture;
+            $row->user->picture = empty($row->user->picture) ? config('settings.doctor_pic') : $this->imageDir . $row->user->picture;
         }
 
         return $this->sendResponse($list);
