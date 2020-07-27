@@ -15,15 +15,40 @@ use App\Http\Controllers\BaseController;
 
 class DoctorController  extends BaseController
 {
-    public function index()
+    public function index(Request $request)
     {
-        $list = DoctorDetail::with('user')->with('speciality')->with('slots')->with('appointments')->get();
+        $specialty_id = $request->input('specialty_id', null);
+        $doctor_id = $request->input('doctor_id', null);
+
+        $list = DoctorDetail::with('user')->with('speciality')->with('slots')->with('appointments')
+            ->when($specialty_id, function ($query, $specialty_id) {
+                return $query->where('doctor_details.specialty_id', $specialty_id);
+            })
+            ->when($doctor_id, function ($query, $doctor_id) {
+                return $query->where('doctor_details.id', $doctor_id);
+            })
+            ->get();
 
         foreach ($list as $row) {
             $row->user->picture = empty($row->user->picture) ? config('settings.doctor_pic') : $this->imageDir . $row->user->picture;
         }
 
         return $this->sendResponse($list);
+    }
+
+    public function list()
+    {
+
+        $list = DoctorDetail::with('user')->get();
+        $data = [];
+        foreach ($list as $row) {
+            $data[] = [
+                'user_id' => $row->user->id,
+                'doctor_id' => $row->id,
+                'name' => $row->user->name
+            ];
+        }
+        return $this->sendResponse($data);
     }
 
     public function doctorSchedule(Request $request)
@@ -38,10 +63,12 @@ class DoctorController  extends BaseController
         }
         $data = $request->all();
         $schedule = DoctorSchedule::where('doctor_id', $data['doctor_id'])->where('day', $data['day'])->first();
+
         if ($schedule) {
             return $this->sendError('Already added!', 200);
         }
         $row = DoctorSchedule::create($data);
+
         $list = $this->_getList($data['doctor_id'], $data, $row);
         return $this->sendResponse($list);
     }

@@ -50,6 +50,7 @@ $router->group(
 
                 /* *** doctor-api *** */
                 $router->get('doctors', ['uses' => 'DoctorController@index']);
+                $router->get('doctors/list', ['uses' => 'DoctorController@list']);
             }
         );
     }
