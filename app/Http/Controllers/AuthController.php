@@ -158,21 +158,23 @@ class AuthController extends BaseController
      */
     public function update(Request $request, $id)
     {
-        $data = $request->only(['name', 'email', 'mobile', 'city_id', 'area_id', 'address', 'blood_group', 'gender', 'user_type']);
+        $data = $request->only(['name', 'email', 'mobile', 'city_id', 'area_id', 'address', 'blood_group', 'gender', 'user_type', 'video_calling_ID']);
         $user = User::with('doctor')->findOrfail($id);
         $user->update($data);
         $user['avatar'] = empty($user->picture) ? config('settings.user_pic') : $this->imageDir . $user->picture;
         if ($user->user_type == 'DOCTOR') {
             $this->_doctor($user, $request);
         }
+
         return $this->sendResponse($user, $this->successMsg);
     }
 
     private function _doctor($user, $request)
     {
+
         if ($user->doctor === null) {
             $user->doctor()->save(new DoctorDetail());
-        } else {
+        } else if (!empty($request->input('doctor'))) {
             $user->doctor->update($request->input('doctor'));
         }
         $user->refresh();
