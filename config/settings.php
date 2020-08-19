@@ -7,6 +7,11 @@ return [
     'defaults' => [
         'guard' => env('AUTH_GUARD', 'api'),
     ],
+    'domain_name' => 'http://shapi.local/',
+
+    'default_image' => [
+        'ambulance' => 'default/ambulance.png'
+    ],
 
     'user_pic' => 'https://avatars0.githubusercontent.com/u/1472352?s=460&v=4',
     'doctor_pic' => 'https://rumaisahospital.com/wp-content/uploads/2015/08/LLH-Doctors-Male-Avatar-300x300.png',

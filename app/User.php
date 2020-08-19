@@ -51,4 +51,14 @@ class User extends Model implements JWTSubject, AuthenticatableContract, Authori
     {
         return $this->hasMany('App\Models\Appointment', 'patient_id');
     }
+
+    public function bloodDonations()
+    {
+        return $this->hasMany('App\Models\BloodDonation');
+    }
+
+    public function ambulanceBookings()
+    {
+        return $this->hasMany('App\Models\AmbulanceBooking');
+    }
 }

@@ -53,7 +53,15 @@ $router->group(
                 $router->get('doctors/list', ['uses' => 'DoctorController@list']);
 
                 /* *** Blood Donation *** */
+                $router->get('blood-donations', ['uses' => 'ServiceController@bloodDonationList']);
                 $router->post('blood-donations', ['uses' => 'ServiceController@bloodDonation']);
+
+                /* *** Ambulance Service *** */
+                $router->post('ambulances', ['uses' => 'ServiceController@storeAmbulance']);
+                $router->get('ambulances', ['uses' => 'ServiceController@getAmbulanceList']);
+                $router->post('ambulance_bookings', ['uses' => 'ServiceController@storeAmbulanceBooking']);
+                $router->get('ambulance_bookings', ['uses' => 'ServiceController@ambulanceBookingList']);
+
             }
         );
     }

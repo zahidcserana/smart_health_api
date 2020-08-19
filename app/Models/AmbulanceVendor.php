@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class BloodDonationRequest extends Model
+class AmbulanceVendor extends Model
 {
     use SoftDeletes;
     protected $guarded = [];
@@ -14,8 +14,9 @@ class BloodDonationRequest extends Model
         'deleted_at',
     ];
 
-    public function user()
+
+    public function ambulanceBookings()
     {
-        return $this->belongsTo('App\User');
+        return $this->hasMany('App\Models\AmbulanceBooking');
     }
 }

@@ -24,9 +24,11 @@ class BaseController extends Controller
     protected $appointment;
     protected $jwt;
     protected $userContainer;
+    protected $user;
 
     public function __construct(Guard $auth, JWTAuth $jwt)
     {
+        $this->user = auth()->user();
         $this->jwt = $jwt;
         $this->userContainer = new UserContainer();
         $this->dateData = array(
@@ -36,7 +38,7 @@ class BaseController extends Controller
         );
         $this->currentUser = $auth->user();
         $this->appointment = new Appointment();
-        $this->domain = env('DOMAIN_NAME');
+        $this->domain = config('settings.domain_name');
         $this->imageDir = $this->domain . '/assets/images/';
     }
 

@@ -99,7 +99,7 @@ class AuthController extends BaseController
      */
     public function register(Request $request)
     {
-        $fromMobile = false;
+        $fromMobile = true;
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'mobile' => 'required',
@@ -199,7 +199,7 @@ class AuthController extends BaseController
 
             $user->update(['picture' => $picture]);
 
-            return $this->sendResponse(env('DOMAIN_NAME') . $dir, $this->successMsg);
+            return $this->sendResponse(config('settings.domain_name') . $dir, $this->successMsg);
         } else {
             return response()->json(["message" => "Select image first."]);
         }
